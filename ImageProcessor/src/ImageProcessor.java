@@ -1,35 +1,32 @@
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-
 import java.awt.*;
 import java.awt.event.*;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.imageio.ImageIO;
+
 import java.io.File;
 import java.io.IOException;
-
-
 
 public class ImageProcessor {
 	
 	private static JFrame mainFrm;
 	private static Container contentPane;
 	private static JPanel pnl1, pnl2, pnl3, pnl4, imgPnl;
-	private static JButton imprt1Btn, imprt2Btn, saveBtn, gryBtn, edgeBtn, cntrstBtn, smthBtn, addBtn, brghtBtn, etcBtn; 
+	private static JButton imprt1Btn, imprt2Btn, saveBtn, gryBtn, edgeBtn, cntrstBtn, smthBtn, addBtn, brghtBtn, darkBtn, etcBtn; 
 	private static JLabel toolBarLbl, img1Lbl, img2Lbl, rsltLbl, jlb;
 	
 	private static JFileChooser choice = new JFileChooser("C:\\Users\\류지연\\Pictures");
 	
 	private static ImageIcon rsltImg;
 	
-	private static BufferedImage dfltBffdImg, gryBffdImg;
+	private static BufferedImage dfltBffdImg, gryBffdImg, brghtBffdImg, drkBffdImg;
 	
-	private static Image dfltImg, gryImg;
+	private static Image dfltImg, gryImg, brghtImg, drkImg;
 
 	private static ActionListener actionListener = new ActionListener() {
 	
-		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
@@ -59,9 +56,7 @@ public class ImageProcessor {
 
 						e1.printStackTrace();
 					}
-					
-					
-					
+				
 				}
 				
 			}
@@ -90,29 +85,25 @@ public class ImageProcessor {
 					} catch (IOException e1) {
 
 						e1.printStackTrace();
+						
 					}
-					
-					
-					
+				
 				}
-				
-			}
-			
-			else if (e.getSource() == saveBtn) {
-				
 				
 			}
 			
 			else if (e.getSource() == gryBtn) {
 				
-				int width = dfltBffdImg.getWidth();
-				int height = dfltBffdImg.getHeight();
+				gryBffdImg = dfltBffdImg;
+				
+				int width = gryBffdImg.getWidth();
+				int height = gryBffdImg.getHeight();
 				
 				for (int j = 0; j < height ; j++) {
 					
 					for (int i = 0; i < width; i++) {
 						
-						int p = dfltBffdImg.getRGB(i, j);
+						int p = gryBffdImg.getRGB(i, j);
 						
 						int a = (p>>24)&0xff;
 						int r = (p>>16)&0xff;
@@ -123,7 +114,7 @@ public class ImageProcessor {
 						
 						p = (a<<24) | (avg<<16) | (avg<<8) | avg;
 						
-						gryBffdImg = dfltBffdImg;
+						
 						gryBffdImg.setRGB(i, j, p);
 						
 					}
@@ -134,10 +125,108 @@ public class ImageProcessor {
 				ImageIcon imgIcon = new ImageIcon(gryImg);
 				
 				rsltLbl.setIcon(imgIcon);
+			
+			}
+			
+			else if (e.getSource() == brghtBtn) {
 				
+				brghtBffdImg = dfltBffdImg;
 				
+				int width = brghtBffdImg.getWidth();
+				int height = brghtBffdImg.getHeight();
+				
+				for (int j = 0; j < height ; j++) {
+					
+					for (int i = 0; i < width; i++) {
+						
+						int p = brghtBffdImg.getRGB(i, j);
+						
+						int a = (p>>24)&0xff;
+						int r = (p>>16)&0xff;
+						int g = (p>>8)&0xff;
+						int b = p&0xff;
+						
+						r += 40;
+						g += 40;
+						b += 40;
+			
+						if (r > 255) {
+							 r = 255;
+						}
+						
+						if (g > 255) {
+							g = 255;
+						}
+						
+						if (b > 255) {
+							b = 255;
+						}
+						
+						p = (a<<24) | (r<<16) | (g<<8) | b;
+						
+						brghtBffdImg.setRGB(i, j, p);
+						
+					}
+					
+				}
+				
+				brghtImg = brghtBffdImg.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+				ImageIcon imgIcon = new ImageIcon(brghtImg);
+				
+				rsltLbl.setIcon(imgIcon);
 				
 			}
+			
+else if (e.getSource() == darkBtn) {
+				
+				drkBffdImg = dfltBffdImg;
+				
+				int width = drkBffdImg.getWidth();
+				int height = drkBffdImg.getHeight();
+				
+				for (int j = 0; j < height ; j++) {
+					
+					for (int i = 0; i < width; i++) {
+						
+						int p = drkBffdImg.getRGB(i, j);
+						
+						int a = (p>>24)&0xff;
+						int r = (p>>16)&0xff;
+						int g = (p>>8)&0xff;
+						int b = p&0xff;
+						
+						r -= 40;
+						g -= 40;
+						b -= 40;
+			
+						if (r < 0) {
+							 r = 0;
+						}
+						
+						if (g < 0) {
+							g = 0;
+						}
+						
+						if (b < 0) {
+							b = 0;
+						}
+						
+						p = (a<<24) | (r<<16) | (g<<8) | b;
+						
+						drkBffdImg.setRGB(i, j, p);
+						
+					}
+					
+				}
+				
+				drkImg = drkBffdImg.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+				ImageIcon imgIcon = new ImageIcon(drkImg);
+				
+				rsltLbl.setIcon(imgIcon);
+				
+			}
+			
+			
 			
 		}
 		
@@ -150,7 +239,6 @@ public class ImageProcessor {
 		mainFrm.setLocationRelativeTo(null);
 		mainFrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrm.setResizable(false);
-		
 		
 		contentPane = mainFrm.getContentPane();
 		contentPane.setLayout(new GridLayout(1, 3));
@@ -176,7 +264,6 @@ public class ImageProcessor {
 		pnl1.add(img1Lbl, BorderLayout.CENTER);
 		pnl1.add(imprt1Btn, BorderLayout.SOUTH);
 		
-		
 		pnl2 = new JPanel();
 		pnl2.setLayout(new BorderLayout());
 		pnl2.add(img2Lbl, BorderLayout.CENTER);
@@ -186,26 +273,19 @@ public class ImageProcessor {
 		imgPnl.setLayout(new GridLayout(2, 1));
 		imgPnl.add(pnl1);
 		imgPnl.add(pnl2);
-		
-	
 	
 		pnl3 = new JPanel();
 		pnl3.setLayout(new BorderLayout());
 		saveBtn = new JButton("결과 이미지 저장하기");
 		saveBtn.addActionListener(actionListener);
-		//rsltLbl = new JLabel("결과 이미지");
-//		rsltLbl.setHorizontalAlignment(JLabel.CENTER);
 		
 		rsltLbl = new JLabel();
-		
-		//rsltImg = new ImageIcon("C:\\Users\\류지연\\Pictures\\newYear.jpg");
-		//rsltLbl.setIcon(rsltImg);
-		
+	
 		pnl3.add(rsltLbl, BorderLayout.CENTER);
 		pnl3.add(saveBtn, BorderLayout.SOUTH);
 		
 		pnl4 = new JPanel();
-		pnl4.setLayout(new GridLayout(8, 1));
+		pnl4.setLayout(new GridLayout(10, 1));
 		toolBarLbl = new JLabel("Tool");
 		toolBarLbl.setHorizontalAlignment(JLabel.CENTER);
 		gryBtn = new JButton("흑백 영상 생성");
@@ -223,8 +303,11 @@ public class ImageProcessor {
 		addBtn = new JButton("이미지 합치기");
 		addBtn.addActionListener(actionListener);
 		
-		brghtBtn = new JButton("밝기 조절");
+		brghtBtn = new JButton("밝기 높이기");
 		brghtBtn.addActionListener(actionListener);
+	
+		darkBtn = new JButton("밝기 낮추기");
+		darkBtn.addActionListener(actionListener);
 		
 		etcBtn = new JButton("기타 등등");
 		
@@ -235,6 +318,7 @@ public class ImageProcessor {
 		pnl4.add(smthBtn);
 		pnl4.add(addBtn);
 		pnl4.add(brghtBtn);
+		pnl4.add(darkBtn);
 		pnl4.add(etcBtn);
 		
 		mainFrm.setVisible(true);
@@ -244,25 +328,5 @@ public class ImageProcessor {
 		contentPane.add(pnl4);
 		
 	}
-	
-	
-	
-	
 
 }
-
-
-
-//
-//int sv = jfc.showOpenDialog(this);
-//if (sv == 0) {
-//	String fileSavePath = jfc.getSelectedFile().getAbsolutePath();
-//	String filename = jfc.getSelectedFile().getName();
-//	
-//	File saveFile = new File(fileSavePath);
-//	if (!saveFile.exists()) {
-//		saveFile.createNewFile();
-//	}
-//	JOptionPane.showMessageDialog(this, "저장완료", "저장완료", JOptionPane.INFORMATION_MESSAGE);
-//}
-
