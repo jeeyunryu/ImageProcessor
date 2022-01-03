@@ -17,7 +17,7 @@ public class ImageProcessor {
 	private static Container contentPane;
 	private static JPanel pnl1, pnl2, pnl3, pnl4, imgPnl;
 	private static JButton imprt1Btn, imprt2Btn, saveBtn, gryBtn, edgeBtn, 
-					cntrstBtn, blrBtn, addBtn, brghtBtn, darkBtn, thrshldBtn; 
+					cntrstBtn, blrBtn, addBtn, brghtBtn, darkBtn, thrshldBtn, lowCntrstBtn; 
 	private static JLabel toolBarLbl, img1Lbl, img2Lbl, rsltLbl;
 	private static JFileChooser choice = new JFileChooser("C:\\Users\\류지연\\"
 					+ "Pictures");
@@ -133,8 +133,6 @@ public class ImageProcessor {
 			}
 			
 			else if (e.getSource() == brghtBtn) {
-				
-				
 				
 				JFrame sldrFrm = new JFrame();
 				Container c = sldrFrm.getContentPane();
@@ -407,17 +405,17 @@ public class ImageProcessor {
 			
 			else if (e.getSource() == saveBtn) {
 				
-				Image rsltImg = imgIcon.getImage();
+				//Image rsltImg = imgIcon.getImage();
 				
-				BufferedImage rsltBffdImg = (BufferedImage) rsltImg;
+				//BufferedImage rsltBffdImg = (BufferedImage) rsltImg;
 				
-				//Icon rsltIcon = rsltLbl.getIcon();
-				//BufferedImage bi = new BufferedImage(rsltIcon.getIconWidth(), rsltIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
+				//rsltIcon = rsltLbl.getIcon();
+				BufferedImage bi = new BufferedImage(imgIcon.getIconWidth(), imgIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
 				
 				try {
 					
 					File outputFile = new File("C:\\Users\\류지연\\Pictures\\resultImg.jpg");
-					ImageIO.write(rsltBffdImg, "jpg", outputFile);
+					ImageIO.write(bi, "jpg", outputFile);
 					
 				} catch (IOException e1) {
 					
@@ -427,63 +425,171 @@ public class ImageProcessor {
 			
 			else if (e.getSource() == cntrstBtn) {
 				
-				cntrstBffdImg = deepCopy(dfltBffdImg);
+				JFrame sldrFrm = new JFrame();
+				Container c = sldrFrm.getContentPane();
 				
-				int width = cntrstBffdImg.getWidth();
-				int height = cntrstBffdImg.getHeight();
+				sldrFrm.setLocationRelativeTo(null);
+				sldrFrm.setTitle("Contrast");
+				sldrFrm.setSize(300, 100);
+				sldrFrm.setVisible(true);
 				
-				for (int j = 2; j < height ; j++) {
+				
+				JSlider slider = new JSlider(1, 10, 1);
+				slider.setMinorTickSpacing(1/2);
+				slider.setMajorTickSpacing(1);
+				slider.setPaintTicks(true);
+				slider.setPaintLabels(true);
+				
+				c.add(slider);
+				
+				slider.addChangeListener(new ChangeListener() {
 					
-					for (int i = 2; i < width; i++) {
+					public void stateChanged(ChangeEvent e) {
+
+						value = slider.getValue();
+						cntrstBffdImg = deepCopy(dfltBffdImg);
+				
+						int width = cntrstBffdImg.getWidth();
+						int height = cntrstBffdImg.getHeight();
+						
+						for (int j = 2; j < height ; j++) {
+							
+							for (int i = 2; i < width; i++) {
+							
+								int p = cntrstBffdImg.getRGB(i, j);
+								
+								int a = (p>>24)&0xff;
+								int r = (p>>16)&0xff;
+								int g = (p>>8)&0xff;
+								int b = p&0xff;
+								int gray = (r+g+b)/3;
+								
+								r = gray;
+								g = gray;
+								b = gray;
+								
+								r *= value;
+								g *= value;
+								b *= value;
+								
+								
+								if (r > 255) {
+									r = 255;
+								}
+								
+								if (g > 255) {
+									
+									g = 255;
+									
+								}
+								
+								if (b > 255) {
+									b = 255;
+								}
 					
-						int p = cntrstBffdImg.getRGB(i, j);
-						
-						int a = (p>>24)&0xff;
-						int r = (p>>16)&0xff;
-						int g = (p>>8)&0xff;
-						int b = p&0xff;
-						int gray = (r+g+b)/3;
-						
-						r = gray;
-						g = gray;
-						b = gray;
-						
-						r *= 1.5;
-						g *= 1.5;
-						b *= 1.5;
-						
-						
-						if (r > 255) {
-							r = 255;
-						}
-						
-						if (g > 255) {
-							
-							g = 255;
+								p = (a<<24) | (r<<16) | (g<<8) | b;
+								
+								cntrstBffdImg.setRGB(i, j, p);
+								
+							}
 							
 						}
 						
-						if (b > 255) {
-							b = 255;
-						}
-			
-						p = (a<<24) | (r<<16) | (g<<8) | b;
+						cntrstImg = cntrstBffdImg.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+						imgIcon = new ImageIcon(cntrstImg);
 						
-						cntrstBffdImg.setRGB(i, j, p);
+						rsltLbl.setIcon(imgIcon);
 						
 					}
 					
-				}
-				
-				cntrstImg = cntrstBffdImg.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
-				imgIcon = new ImageIcon(cntrstImg);
-				
-				rsltLbl.setIcon(imgIcon);
-				
-				
+				});
+					
 			}
 			
-			else if (e.getSource() == thrshldBtn) {
+			/*else if (e.getSource() == lowCntrstBtn) {
+				
+				JFrame sldrFrm = new JFrame();
+				Container c = sldrFrm.getContentPane();
+				
+				sldrFrm.setLocationRelativeTo(null);
+				sldrFrm.setTitle("Contrast");
+				sldrFrm.setSize(300, 100);
+				sldrFrm.setVisible(true);
+				
+				
+				JSlider slider = new JSlider(0, 1, 1);
+				slider.setMinorTickSpacing(1/10);
+				slider.setMajorTickSpacing(1);
+				slider.setPaintTicks(true);
+				slider.setPaintLabels(true);
+				
+				c.add(slider);
+				
+				slider.addChangeListener(new ChangeListener() {
+					
+					public void stateChanged(ChangeEvent e) {
+
+						value = slider.getValue();
+						cntrstBffdImg = deepCopy(dfltBffdImg);
+				
+						int width = cntrstBffdImg.getWidth();
+						int height = cntrstBffdImg.getHeight();
+						
+						for (int j = 2; j < height ; j++) {
+							
+							for (int i = 2; i < width; i++) {
+							
+								int p = cntrstBffdImg.getRGB(i, j);
+								
+								int a = (p>>24)&0xff;
+								int r = (p>>16)&0xff;
+								int g = (p>>8)&0xff;
+								int b = p&0xff;
+								int gray = (r+g+b)/3;
+								
+								r = gray;
+								g = gray;
+								b = gray;
+								
+								r *= value;
+								g *= value;
+								b *= value;
+								
+								
+								if (r > 255) {
+									r = 255;
+								}
+								
+								if (g > 255) {
+									
+									g = 255;
+									
+								}
+								
+								if (b > 255) {
+									b = 255;
+								}
+					
+								p = (a<<24) | (r<<16) | (g<<8) | b;
+								
+								cntrstBffdImg.setRGB(i, j, p);
+								
+							}
+							
+						}
+						
+						cntrstImg = cntrstBffdImg.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+						imgIcon = new ImageIcon(cntrstImg);
+						
+						rsltLbl.setIcon(imgIcon);
+						
+					}
+					
+				});
+					
+			}*/
+			
+			/*else if (e.getSource() == thrshldBtn) {
 				
 				thrshldBffdImg = deepCopy(dfltBffdImg);
 				
@@ -527,7 +633,7 @@ public class ImageProcessor {
 				rsltLbl.setIcon(imgIcon);
 				
 				
-			}
+			}*/
 			
 			
 		}
@@ -619,8 +725,11 @@ public class ImageProcessor {
 		/*darkBtn = new JButton("밝기 낮추기");
 		darkBtn.addActionListener(actionListener);*/
 		
-		thrshldBtn = new JButton("Threshold");
-		thrshldBtn.addActionListener(actionListener);
+		/*thrshldBtn = new JButton("Threshold");
+		thrshldBtn.addActionListener(actionListener);*/
+		
+		//lowCntrstBtn = new JButton("Low Contrast");
+		//lowCntrstBtn.addActionListener(actionListener);
 		
 		pnl4.add(toolBarLbl);
 		pnl4.add(gryBtn);
@@ -630,7 +739,8 @@ public class ImageProcessor {
 		//pnl4.add(addBtn);
 		pnl4.add(brghtBtn);
 		//pnl4.add(darkBtn);
-		pnl4.add(thrshldBtn);
+		//pnl4.add(thrshldBtn);
+		//pnl4.add(lowCntrstBtn);
 		
 		mainFrm.setVisible(true);
 		
